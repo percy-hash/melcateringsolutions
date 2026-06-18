@@ -10,28 +10,34 @@
 
 <body>
 
+<!-- Skip to content link -->
+<a href="#main" class="skip-link">Skip to main content</a>
+
 <!-- NAV -->
-<nav>
+<nav role="navigation" aria-label="Main navigation">
     <div class="nav-container">
         <div class="logo">Mel Catering Solutions</div>
 
-        <div class="menu-toggle">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
+        <button class="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-menu">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </button>
 
-        <ul class="nav-links">
+        <ul class="nav-links" id="nav-menu">
             <li><a href="#about">About</a></li>
             <li><a href="#services">Services</a></li>
             <li><a href="#menu">Menu</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
     </div>
+    <!-- Mobile menu overlay -->
+    <div class="nav-overlay"></div>
 </nav>
 
 <!-- HERO -->
-<section class="hero">
+<main id="main">
+<section class="hero" aria-label="Welcome to Mel Catering Solutions">
     <h1>Delicious Catering for Every Occasion</h1>
     <p>Quality Equipment. Professional Service. Unforgettable Experiences.</p>
     <a href="#contact" class="btn">Book Now</a>
@@ -70,7 +76,7 @@
         </div>
 
 
-            <div class="column" style="background-image: url('Screenshot_20260527_142526_WhatsApp.jpg');">
+            <div class="column" style="background-image: url('coporate events.jpg');">
                 <div class="overlay">
                     <h3>Corporate Events</h3>
                     <p>Professional catering solutions for meetings, launches, and conferences.</p>
@@ -99,6 +105,7 @@
 <section id="menu" class="section">
   <div class="container">
     <h2>Featured Menu</h2>
+    <p class="menu-hint">Swipe, use arrow keys, or click dots to explore our offerings</p>
 
     <div class="CSSgal" aria-roledescription="carousel" aria-label="Featured menu slider">
       <!-- Targets (do not wrap in a parent) -->
@@ -175,31 +182,31 @@
     <div class="container contact-container">
 
         <!-- LEFT: FORM -->
-        <form class="contact-form-grid">
+        <form class="contact-form-grid" aria-label="Contact form">
 
             <div class="form-group">
-                <label>First Name</label>
-                <input type="text" required>
+                <label for="first-name">First Name</label>
+                <input type="text" id="first-name" name="first-name" required aria-required="true">
             </div>
 
             <div class="form-group">
-                <label>Last Name</label>
-                <input type="text" required>
+                <label for="last-name">Last Name</label>
+                <input type="text" id="last-name" name="last-name" required aria-required="true">
             </div>
 
             <div class="form-group">
-                <label>Email</label>
-                <input type="email" required>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required aria-required="true">
             </div>
 
             <div class="form-group">
-                <label>Phone Number</label>
-                <input type="text">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone">
             </div>
 
             <div class="form-group full-width">
-                <label>What do you have in mind</label>
-                <textarea placeholder="Please enter query..."></textarea>
+                <label for="message">What do you have in mind</label>
+                <textarea id="message" name="message" placeholder="Please enter query..."></textarea>
             </div>
 
             <div class="full-width">
@@ -249,8 +256,63 @@
 <footer>
     <p>© 2026 Mel Catering Solutions</p>
 </footer>
+</main>
 
 <script>
+// ============================================
+// MOBILE MENU TOGGLE
+// ============================================
+(() => {
+  const menuToggle = document.querySelector('.menu-toggle');
+  const navMenu = document.getElementById('nav-menu');
+  const navOverlay = document.querySelector('.nav-overlay');
+  const navLinks = document.querySelectorAll('.nav-links a');
+
+  function closeMenu() {
+    menuToggle.setAttribute('aria-expanded', 'false');
+    navMenu.classList.remove('active');
+    navOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function openMenu() {
+    menuToggle.setAttribute('aria-expanded', 'true');
+    navMenu.classList.add('active');
+    navOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Toggle menu on button click
+  menuToggle.addEventListener('click', () => {
+    const isOpen = menuToggle.getAttribute('aria-expanded') === 'true';
+    if (isOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  // Close menu when overlay clicked
+  navOverlay.addEventListener('click', closeMenu);
+
+  // Close menu when a link is clicked
+  navLinks.forEach(link => {
+    link.addEventListener('click', closeMenu);
+  });
+
+  // Close menu on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeMenu();
+    }
+  });
+})();
+</script>
+
+<script>
+// ============================================
+// INTERSECTION OBSERVER FOR SERVICES ANIMATION
+// ============================================
 const columns = document.querySelectorAll(".column");
 
 const observer = new IntersectionObserver((entries) => {
@@ -263,7 +325,11 @@ const observer = new IntersectionObserver((entries) => {
 
 columns.forEach(col => observer.observe(col));
 </script>
+
 <script>
+// ============================================
+// FEATURED MENU SLIDER WITH ACCESSIBILITY
+// ============================================
 (() => {
   const gal = document.querySelector('.CSSgal');
   if (!gal) return;
@@ -274,26 +340,20 @@ columns.forEach(col => observer.observe(col));
 
   function setSlide(index) {
     const safe = (index + slideCount) % slideCount;
-
-    // Remove previous slide classes
     gal.classList.remove('is-slide-0','is-slide-1','is-slide-2','is-slide-3');
     gal.classList.add(`is-slide-${safe}`);
   }
 
-  // Start on Slide 1 (index 0) and never touch URL/hash.
   let currentIndex = 0;
   setSlide(currentIndex);
 
-  // If URL contains an old hash like #s4, clear it so the browser doesn't jump on load.
   if (location.hash && /^#s[1-4]$/.test(location.hash)) {
     history.replaceState(null, '', location.pathname + location.search);
   }
 
-
   // AUTOPLAY
   let timer = null;
   const intervalMs = 5000;
-
 
   function start() {
     if (prefersReduced) return;
@@ -317,30 +377,54 @@ columns.forEach(col => observer.observe(col));
 
   // Keyboard support (when slider has focus)
   slider.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight') { e.preventDefault(); currentIndex = (currentIndex + 1) % slideCount; setSlide(currentIndex); }
-    if (e.key === 'ArrowLeft')  { e.preventDefault(); currentIndex = (currentIndex - 1 + slideCount) % slideCount; setSlide(currentIndex); }
+    if (e.key === 'ArrowRight') { 
+      e.preventDefault(); 
+      stop(); // Stop autoplay on manual control
+      currentIndex = (currentIndex + 1) % slideCount; 
+      setSlide(currentIndex); 
+      start(); // Resume autoplay
+    }
+    if (e.key === 'ArrowLeft')  { 
+      e.preventDefault(); 
+      stop();
+      currentIndex = (currentIndex - 1 + slideCount) % slideCount; 
+      setSlide(currentIndex); 
+      start();
+    }
   });
 
-
-  // Swipe support
+  // Swipe support - more responsive
   let startX = 0;
   let endX = 0;
+  let isAnimating = false;
 
   slider.addEventListener('touchstart', (e) => {
+    if (isAnimating) return;
     startX = e.changedTouches[0].clientX;
   }, { passive: true });
 
   slider.addEventListener('touchend', (e) => {
+    if (isAnimating) return;
     endX = e.changedTouches[0].clientX;
     const dx = endX - startX;
 
-    if (Math.abs(dx) > 50) {
+    // Reduced threshold from 50px to 30px for better responsiveness
+    if (Math.abs(dx) > 30) {
+      isAnimating = true;
+      stop(); // Stop autoplay on manual control
+      
       if (dx < 0) currentIndex = (currentIndex + 1) % slideCount;
       else currentIndex = (currentIndex - 1 + slideCount) % slideCount;
+      
       setSlide(currentIndex);
+      
+      // Resume autoplay after animation
+      setTimeout(() => {
+        isAnimating = false;
+        start();
+      }, 600);
     }
   }, { passive: true });
-
 
   // Start autoplay
   start();
@@ -349,4 +433,3 @@ columns.forEach(col => observer.observe(col));
 
 </body>
 </html>
-``
